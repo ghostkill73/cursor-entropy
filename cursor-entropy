@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+#########################################################################
+# Configs
+#########################################################################
+
+declare -i TRUE=0
+declare -i FALSE=1
+declare -i ERROR=2
+
+___error_message()
+{
+	printf '%b\n' "\e[1;31merror\e[m: $*"
+	exit "$ERROR"
+}
+
+[[ -z "$(type -P xdotool)" ]] && \
+	___error_message "xdotool not installed."
+
+#########################################################################
+# Functions
+#########################################################################
+
+while :; do
+        current="$(xdotool getmouselocation)"
+
+        # x position
+        : "${current%% *}"
+        pos_x="${_#x:}"
+
+        # y position
+        : "${current#* }"
+        : "${_%% *}"
+        pos_y="${_#y:}"
+
+        [[ "$old_pos_x" = "$pos_x" ]] || \
+	[[ "$old_pos_y" = "$pos_y" ]] && \
+	{
+		sleep 0.05
+		continue
+        }
+
+        old_pos_x="$pos_x"
+        old_pos_y="$pos_y"
+
+        printf '%s' "$((pos_x + pos_y))"
+done
